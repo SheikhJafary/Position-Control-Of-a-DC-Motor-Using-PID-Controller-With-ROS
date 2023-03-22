@@ -55,8 +55,8 @@ Arduino Node :-
 
 Below is the **rqt_graph** of the program
 
-![rosgraph](<img src="https://sheikhjafari.pgitic.ir/gragh.jpg" width=377 height=360 alt="circuit_diagram"/>)
-<img src="https://sheikhjafari.pgitic.ir/gragh.jpg" width=377 height=360 alt="circuit_diagram"/>
+<img src="/Pictures/graph.jpg" alt="encoder" height=90 width=1116/>
+
 Basic Flow of the program :-
 
 1. The encodervalue is published from Arduino node. 
