@@ -78,11 +78,11 @@ Now, if we use a single channel encoder as shown above there is a disadvantage t
 
 To overcome this disadvantage we use quadrature encoder as shown below.
 
-<img src="https://sheikhjafari.pgitic.ir/quadrature encoder.jpg" alt="encoder" height=270 width=467/>
+<img src="https://sheikhjafari.pgitic.ir/quadrature encoder.jpg" alt="Encoder" height=270 width=467/>
 
 Now we can calculate the phase difference between the output signals of the encoder and determine the direction as shown.
 
-<img src="https://user-images.githubusercontent.com/56308805/110928086-7ba38800-834c-11eb-87c2-70186fb11cb1.png" alt="encoder_quad"/>
+<img src="/Pictures/rotaryencoderoutput.png" alt="Rotary Encoder Output"/>
 
 
 
