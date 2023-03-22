@@ -29,9 +29,9 @@ These two part of the project communicate with each other through the rosserial 
 1. ROS Melodic along with rosserial library/package.
 2. Arduino Uno
 3. DC Geared Motor with Encoder ( 12v, 300RPM at 10Kgcm RMCS-5033 ) <br />
-datasheet :- https://robokits.download/downloads/RMCS%205033.pdf
+datasheet :- <a href="/Datasheets/RMCS%205033.pdf" > RMCS 205033  <a/>
 4. Motor Shield : VNH3ASP30 DC Motor Driver 2x14A <br />
-datasheet :- https://www.pololu.com/file/0J52/vnh2sp30.pdf
+datasheet :- <a href="/Datasheets/vnh2sp30.pdf" > VNH3ASP30  <a/>
 5. 12V 4A AC/DC Adapter
 
 ## Programming Languages Used
