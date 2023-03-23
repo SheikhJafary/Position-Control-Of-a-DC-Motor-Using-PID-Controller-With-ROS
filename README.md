@@ -10,12 +10,12 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
   - [Program Explaination](#program-explaination)
     - [Arduino Code (serial node)](#arduino-code-serial-node)
       - [Header files](#Header-files)
-      - [Initialize Pins, PWM and Ros Parameters](#Initialize-Pins,-PWM-and-Ros-Parameters)
+      - [Initialize Pins, PWM and Ros Parameters](#-Initialize-Pins,-PWM-and-Ros-Parameters)
       - [Main Loop](#Main-Loop)
       - [Reading the encoder values](#Reading-the-encoder-values)
       - [Drive the motor](#Drive-the-motor)
       - [Circuit Diagram](#circuit-diagram)
-    - [Python Node (PID_node.py)](#python-node-PID_node)
+    - [Python Node (PID_node.py)](#-python-node-PID_node)
   
 ## Introduction
 
