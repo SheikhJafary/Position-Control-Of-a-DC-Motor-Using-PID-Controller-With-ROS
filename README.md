@@ -265,6 +265,7 @@ Circuit diagram for interfacing encoder motor with Arduino Mega and VNH2P30 Moto
 <img src="https://sheikhjafari.pgitic.ir/motor2-525x360.jpg" width=525 height=360 alt="circuit_diagram"/>
 </div>
 ---
+  
 ### Python Node
 
 This code is written for the angular control of the motor, but it can be modified for the distance/position control according to the wheel diameter.
@@ -350,9 +351,7 @@ if __name__ == '__main__':
 
 ```
 ---
-## Output Video
-
-**Steps to run the code**
+#### Steps to run the code
 
 ```shell
 roscore
