@@ -13,7 +13,6 @@ const int encoderPinB = 3;
 
 volatile int64_t currentPosition = 0;
 
-#define MOTOR 0
 #define BRAKE 0
 #define CW    1
 #define CCW   2

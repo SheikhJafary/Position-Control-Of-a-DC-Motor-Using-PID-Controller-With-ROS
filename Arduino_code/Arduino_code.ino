@@ -30,27 +30,28 @@ void loop()
   delay(100);
 }
 
+//This function gets pwm value as input parameter
+//Determines the direction of the motor 
+//Call Motor_Drive function
 void get_apply_pwm( const std_msgs::Int16& pwm_value){
   int PWM_Val =0;
   PWM_Val = pwm_value.data;
   
   if ( PWM_Val > 0 )
   {
-  drive_motor(MOTOR,CCW,PWM_Val);
+  drive_motor(CCW,PWM_Val);
   }
   else
   {
-  drive_motor(MOTOR,CW,abs(PWM_Val));
+  drive_motor(CW,abs(PWM_Val));
   }
 }
 //Function that controls the variables: 
-//motor_en(0 or 1), 
 //direction (cw or ccw) ,
-//pwm (entra 0 to 255);
-void drive_motor(int16_t motor_en, int16_t direct, uint16_t pwm_Value)         
+//pwm (0 to 255);
+void drive_motor(int16_t direct, uint16_t pwm_Value)         
 {
-  if(motor_en == MOTOR)
-  {
+ 
     if(direct == CW) //Set Direction Clockwise
     {
       digitalWrite(MOTOR_A1_PIN, LOW); 
@@ -68,8 +69,7 @@ void drive_motor(int16_t motor_en, int16_t direct, uint16_t pwm_Value)
     }
     
     analogWrite(MOTOR_PWM_PIN, pwm_Value); //Set Speed 
-  }
-  
+   
 }
 
 
