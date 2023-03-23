@@ -9,8 +9,9 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
       - [What is a PID Controller?](#what-is-a-pid-controller)
   - [Program Explaination](#program-explaination)
     - [Arduino Code (serial node)](#arduino-code-serial-node)
-      - [Code to rotate the motor.](#code-to-rotate-the-motor)
+      - [Header files](#Header-files)
       - [Code for reading the encoder values](#code-for-reading-the-encoder-values)
+      - [Code to rotate the motor.](#code-to-rotate-the-motor)
       - [Circuit Diagram](#circuit-diagram)
     - [Python Node (PID_node.py)](#python-node-PID_node)
   
@@ -106,7 +107,8 @@ Following are general types of system response depending upon the P,I,D values.
 
 ### Arduino Code (serial node)
 
-####Header files
+#### Header files
+  
 we integrate the ros.h library to enable ROS compatiblity
 Header files for including ros and std_msgs package which is to define the data type of that topic.
 Refer to headers.h. 
@@ -117,21 +119,10 @@ Refer to headers.h.
 #include <std_msgs/Int16.h>
 
 ```
-#### Main Loop
-Now we write the publisher inside loop to continuosly publish the updated encodervalues to the given topic.
-
-```cpp
-void loop()
-{
-  nh.loginfo("Encoder Value");
-  encoder.data = currentPosition;
-  ENC_Value.publish( &encoder );
-  nh.spinOnce();
-  delay(100);
-}
-```
-#### Code for reading the encoder value
-In setup function, we set up the encoder pins as interrupt pins, run timer and initialize ROS node.
+#### Initialize Pins, PWM and Ros Parameters
+  
+  In setup function, we set up the encoder pins as interrupt pins, run timer , initialize ROS node and creat a publisher and Subscriber.
+  
 ```cpp
 void setup()
 {
@@ -152,6 +143,21 @@ void setup()
   nh.subscribe(PWM_Value);//Subscribing to pwm topic
 }
 ```
+#### Main Loop
+Now we write the publisher inside loop to continuosly publish the updated encodervalues to the given topic.
+
+```cpp
+void loop()
+{
+  nh.loginfo("Encoder Value");
+  encoder.data = currentPosition;
+  ENC_Value.publish( &encoder );
+  nh.spinOnce();
+  delay(100);
+}
+```
+#### Code for reading the encoder value
+
 Now we code the Interrupt service routine program to update the encoder value upon the movement of the shaft
 ```cpp
 void readEncoderA()
