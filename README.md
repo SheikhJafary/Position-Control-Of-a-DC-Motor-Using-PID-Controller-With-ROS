@@ -12,12 +12,8 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
       - [Code to rotate the motor.](#code-to-rotate-the-motor)
       - [Code for reading the encoder values](#code-for-reading-the-encoder-values)
       - [Circuit Diagram](#circuit-diagram)
-    - [Python Node (node_motor.py)](#python-node-node_motorpy)
-  - [Output Video](#output-video)
-  - [Appendix and FAQ](#appendix-and-faq)
-          - [Tags: `PID Control` `Documentation` `DC Motor with encoder` `ROS` `Arduino` `Tutorial` `python` `VNH3ASP30 Motor shield`](#tags-PID-control-documentation-dc-motor-with-encoder-ros-arduino-tutorial-python-vnh3asp30-motor-shield)
-
-
+    - [Python Node (PID_node.py)](#python-node-PID_node)
+  
 ## Introduction
 
 This project is designed with the purpose of controlling the position of a dc motor with ROS code and it consists of two prats. 
@@ -113,76 +109,87 @@ Following are general types of system response depending upon the P,I,D values.
 #### Code to rotate the motor.
 Defining the Motor Pins for motor1 slot on the shield.
 ```cpp
-#define MOTOR_1 0
+// Arduino hardware pins
+#define MOTOR_A1_PIN  7   //Positive end for motor 
+#define MOTOR_B1_PIN  8   //Negative end for motor 
+#define MOTOR_PWM_PIN 5   //Speed control signal for motor
+
+const int encoderPinA = 2;
+const int encoderPinB = 3;
+
+volatile int64_t currentPosition = 0;
+
+#define MOTOR 0
 #define BRAKE 0
 #define CW    1
 #define CCW   2
-#define MOTOR_A1_PIN 7
-#define MOTOR_B1_PIN 8
-
-#define PWM_MOTOR_1 5
-
-const int encoderPinA = 19;
-const int encoderPinB = 20;
 ```
 Now, we define a function to move the motor according to the direction and PWM Signal
 ```cpp
-void motorGo(int16_t motor, int16_t direct, uint16_t pwm)
-  if(motor == MOTOR_1)
+/Function that controls the variables: 
+//motor_en(0 or 1), 
+//direction (cw or ccw) ,
+//pwm (entra 0 to 255);
+void drive_motor(int16_t motor_en, int16_t direct, uint16_t pwm_Value)         
+{
+  if(motor_en == MOTOR)
   {
-    if(direct == CW)
+    if(direct == CW) //Set Direction Clockwise
     {
       digitalWrite(MOTOR_A1_PIN, LOW); 
       digitalWrite(MOTOR_B1_PIN, HIGH);
     }
-    else if(direct == CCW)
+    else if(direct == CCW) //Set Direction Anticlockwise
     {
       digitalWrite(MOTOR_A1_PIN, HIGH);
       digitalWrite(MOTOR_B1_PIN, LOW);      
     }
-    else
+    else //Stop Motor
     {
       digitalWrite(MOTOR_A1_PIN, LOW);
       digitalWrite(MOTOR_B1_PIN, LOW);            
-    }
-    
-    analogWrite(PWM_MOTOR_1, pwm); 
-  }
+    }    
+    analogWrite(MOTOR_PWM_PIN, pwm_Value); //Set Speed 
+  } 
+}
 ```
 Now we want create a function to move the motor according to the sign of PWM value given to it.
-Also we write the subscriber for the topic /PWM_Values.
+Also we write the subscriber for the topic /PWM_Value.
 ```cpp
-void pwm_input( const std_msgs::Int16& pwm_value){
-  int pwm =0;
-  pwm = pwm_value.data;
+void get_apply_pwm( const std_msgs::Int16& pwm_value){
+  int PWM_Val =0;
+  PWM_Val = pwm_value.data;
   
-  if ( pwm > 0 )
+  if ( PWM_Val > 0 )
   {
-  motorGo(MOTOR_1,CCW,pwm);
+  drive_motor(MOTOR,CCW,PWM_Val);
   }
   else
   {
-  motorGo(MOTOR_1,CW,abs(pwm));
+  drive_motor(MOTOR,CW,abs(PWM_Val));
   }
-ros::Subscriber<std_msgs::Int16> pwm("PWM_Values", &pwm_input);
+}
 ```
 #### Code for reading the encoder values
-Setting up the encoder pins as interrupt pins
+In setup function, we set up the encoder pins as interrupt pins, run timer and initialize ROS node.
 ```cpp
-volatile int64_t currentPosition = 0;
-
 void setup()
 {
-  nh.initNode();
-  nh.advertise(encoderValue);
-  nh.subscribe(pwm);
+  //---------------------------------------------- Set PWM frequency for D11 & D12 -----------------------------
+  TCCR1B = (TCCR1B & 0b11111000) | 0x01; //31.37255 [kHz]// set timer 1 divisor to     1 for PWM frequency of 31372.55 Hz
   
-  pinMode (encoderPinA, INPUT_PULLUP);
-  pinMode (encoderPinB, INPUT_PULLUP);
+  //---------------------------------------------- Set Encoder pins and interrupts -----------------------------
+  pinMode (encoderPinA, INPUT_PULLUP);// sets the digital pin encoderPinA as input
+  pinMode (encoderPinB, INPUT_PULLUP);// sets the digital pin encoderPinB as input
+  //Trigger the interrupt whenever the pin encoderPinA changes value and call readEncoderA() function 
   attachInterrupt (digitalPinToInterrupt (encoderPinA), readEncoderA, CHANGE);
+  //Trigger the interrupt whenever the pin encoderPinB changes value and call readEncoderB() function
   attachInterrupt (digitalPinToInterrupt (encoderPinB), readEncoderB, CHANGE);
 
-  TCCR1B = TCCR1B & 0b11111000 | 1;
+  //---------------------------------------------- Setup Ros Node ----------------------------------------------- 
+  nh.initNode(); //initializes the ROS node for the process
+  nh.advertise(ENC_Value);// create a ros::Publisher which is used to publish on ENC_Value topic
+  nh.subscribe(PWM_Value);//Subscribing to pwm topic
 }
 ```
 Now we code the Interrupt service routine program to update the encoder value upon the movement of the shaft
@@ -191,11 +198,11 @@ void readEncoderA()
 {
   if (digitalRead(encoderPinA) != digitalRead(encoderPinB))
   {
-    currentPosition++;
+    currentPosition++;//Clockwise rotation
   }
   else
   {
-    currentPosition--;
+    currentPosition--; //Counter_Clockwise Rotation
   }
 }
 
@@ -203,11 +210,11 @@ void readEncoderB()
 {
   if (digitalRead(encoderPinA) == digitalRead(encoderPinB))
   {
-    currentPosition++;
+    currentPosition++;//Clockwise rotation
   }
   else
   {
-    currentPosition--;
+    currentPosition--;//Counter_Clockwise Rotation
   }
 }
 ```
@@ -220,25 +227,20 @@ Header files for including ros and std_msgs package which is to define the data 
 #include <std_msgs/Int16.h>
 
 ros::NodeHandle  nh;
-
 std_msgs::Int64 encoder; 
-
-ros::Publisher encoderValue("encoderValue", &encoder);
+ros::Publisher ENC_Value("ENC_Value", &encoder);
+ros::Subscriber<std_msgs::Int16> PWM_Value("PWM_Value", &get_apply_pwm);
 ```
 Now we write the publisher inside loop to continuosly publish the updated encodervalues to the given topic.
 
 ```cpp
 void loop()
 {
-    
   nh.loginfo("Encoder Value");
-  
   encoder.data = currentPosition;
-  encoderValue.publish( &encoder );
-  
+  ENC_Value.publish( &encoder );
   nh.spinOnce();
   delay(100);
-  
 }
 ```
 ---
@@ -249,7 +251,7 @@ Circuit diagram for interfacing encoder motor with Arduino Mega and VNH2P30 Moto
 <img src="https://sheikhjafari.pgitic.ir/motor2-525x360.jpg" width=525 height=360 alt="circuit_diagram"/>
 </div>
 ---
-### Python Node (node_motor.py)
+### Python Node (PID_node.py)
 
 This code is written for the angular control of the motor, but it can be modified for the distance/position control according to the wheel diameter.
 
@@ -353,17 +355,6 @@ Now we publish the required output angle to /desiredPosition topic using termina
 ```
 rostopic pub /desiredPosition std_msgs/Float64 "data: 0.0"
 ```
-You will output similar to this
-YouTube Video Link:-
 
-
-## Appendix and FAQ
-
-
-**Find this document incomplete?** Leave a comment!
-Suggestions are always welcome.
-
-
-###### Tags: `PID Control` `Documentation` `DC Motor with encoder` `ROS` `Arduino` `Tutorial` `python` `VNH3ASP30 Motor shield`
 
 ---
