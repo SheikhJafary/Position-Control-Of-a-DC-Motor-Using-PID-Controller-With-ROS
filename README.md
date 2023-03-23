@@ -17,6 +17,7 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
       - [Circuit Diagram](#circuit-diagram)
     - [Python Node](#python-node)
       - [Global variables](#Global-variables)
+      - [Functions](#Functions)
       - [Steps to run the code](#Steps-to-run-the-code)
   
 ## Introduction
@@ -297,6 +298,8 @@ started1 = False
 desired_Position = 0.0
 
 ```
+#### Functions
+  
 Defining Callback functions for subscribers and a general function with timer for subscribing to two topics */ENC_Value* and */desiredPosition*.
 ```python
 pub = rospy.Publisher('/PWM_Values',Int16,queue_size=100)
