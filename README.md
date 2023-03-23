@@ -106,71 +106,31 @@ Following are general types of system response depending upon the P,I,D values.
 
 ### Arduino Code (serial node)
 
-#### Code to rotate the motor.
-Defining the Motor Pins for motor1 slot on the shield.
+####Header files
+we integrate the ros.h library to enable ROS compatiblity
+Header files for including ros and std_msgs package which is to define the data type of that topic.
+Refer to headers.h. 
 ```cpp
-// Arduino hardware pins
-#define MOTOR_A1_PIN  7   //Positive end for motor 
-#define MOTOR_B1_PIN  8   //Negative end for motor 
-#define MOTOR_PWM_PIN 5   //Speed control signal for motor
+#include <ros.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/Int64.h>
+#include <std_msgs/Int16.h>
 
-const int encoderPinA = 2;
-const int encoderPinB = 3;
-
-volatile int64_t currentPosition = 0;
-
-#define MOTOR 0
-#define BRAKE 0
-#define CW    1
-#define CCW   2
 ```
-Now, we define a function to move the motor according to the direction and PWM Signal
+#### Main Loop
+Now we write the publisher inside loop to continuosly publish the updated encodervalues to the given topic.
+
 ```cpp
-/Function that controls the variables: 
-//motor_en(0 or 1), 
-//direction (cw or ccw) ,
-//pwm (entra 0 to 255);
-void drive_motor(int16_t motor_en, int16_t direct, uint16_t pwm_Value)         
+void loop()
 {
-  if(motor_en == MOTOR)
-  {
-    if(direct == CW) //Set Direction Clockwise
-    {
-      digitalWrite(MOTOR_A1_PIN, LOW); 
-      digitalWrite(MOTOR_B1_PIN, HIGH);
-    }
-    else if(direct == CCW) //Set Direction Anticlockwise
-    {
-      digitalWrite(MOTOR_A1_PIN, HIGH);
-      digitalWrite(MOTOR_B1_PIN, LOW);      
-    }
-    else //Stop Motor
-    {
-      digitalWrite(MOTOR_A1_PIN, LOW);
-      digitalWrite(MOTOR_B1_PIN, LOW);            
-    }    
-    analogWrite(MOTOR_PWM_PIN, pwm_Value); //Set Speed 
-  } 
+  nh.loginfo("Encoder Value");
+  encoder.data = currentPosition;
+  ENC_Value.publish( &encoder );
+  nh.spinOnce();
+  delay(100);
 }
 ```
-Now we want create a function to move the motor according to the sign of PWM value given to it.
-Also we write the subscriber for the topic /PWM_Value.
-```cpp
-void get_apply_pwm( const std_msgs::Int16& pwm_value){
-  int PWM_Val =0;
-  PWM_Val = pwm_value.data;
-  
-  if ( PWM_Val > 0 )
-  {
-  drive_motor(MOTOR,CCW,PWM_Val);
-  }
-  else
-  {
-  drive_motor(MOTOR,CW,abs(PWM_Val));
-  }
-}
-```
-#### Code for reading the encoder values
+#### Code for reading the encoder value
 In setup function, we set up the encoder pins as interrupt pins, run timer and initialize ROS node.
 ```cpp
 void setup()
@@ -218,29 +178,75 @@ void readEncoderB()
   }
 }
 ```
-Now we integrate the ros.h library to enable ROS compatiblity
-Header files for including ros and std_msgs package which is to define the data type of that topic.
+#### Code to rotate the motor
+Defining the Motor Pins for motor1 slot on the shield.
+Refer to var.h.
 ```cpp
-#include <ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Int64.h>
-#include <std_msgs/Int16.h>
+// Arduino hardware pins
+#define MOTOR_A1_PIN  7   //Positive end for motor 
+#define MOTOR_B1_PIN  8   //Negative end for motor 
+#define MOTOR_PWM_PIN 5   //Speed control signal for motor
 
-ros::NodeHandle  nh;
-std_msgs::Int64 encoder; 
-ros::Publisher ENC_Value("ENC_Value", &encoder);
+const int encoderPinA = 2;
+const int encoderPinB = 3;
+
+volatile int64_t currentPosition = 0;
+
+#define BRAKE 0
+#define CW    1
+#define CCW   2
+```
+we write the subscriber for the topic /PWM_Value.
+
+```cpp
 ros::Subscriber<std_msgs::Int16> PWM_Value("PWM_Value", &get_apply_pwm);
 ```
-Now we write the publisher inside loop to continuosly publish the updated encodervalues to the given topic.
 
+Now we want create a function to move the motor according to the sign of PWM value given to it.
 ```cpp
-void loop()
+//This function gets pwm value as input parameter
+//Determines the direction of the motor 
+//Call Motor_Drive function
+void get_apply_pwm( const std_msgs::Int16& pwm_value){
+  int PWM_Val =0;
+  PWM_Val = pwm_value.data;
+  
+  if ( PWM_Val > 0 )
+  {
+  drive_motor(CCW,PWM_Val);
+  }
+  else
+  {
+  drive_motor(CW,abs(PWM_Val));
+  }
+}
+```
+Now, we define a function to move the motor according to the direction and PWM Signal
+```cpp
+//This function controls the variables: 
+//direction (cw or ccw) ,
+//pwm (0 to 255);
+void drive_motor(int16_t direct, uint16_t pwm_Value)         
 {
-  nh.loginfo("Encoder Value");
-  encoder.data = currentPosition;
-  ENC_Value.publish( &encoder );
-  nh.spinOnce();
-  delay(100);
+ 
+    if(direct == CW) //Set Direction Clockwise
+    {
+      digitalWrite(MOTOR_A1_PIN, LOW); 
+      digitalWrite(MOTOR_B1_PIN, HIGH);
+    }
+    else if(direct == CCW) //Set Direction Anticlockwise
+    {
+      digitalWrite(MOTOR_A1_PIN, HIGH);
+      digitalWrite(MOTOR_B1_PIN, LOW);      
+    }
+    else //Stop Motor
+    {
+      digitalWrite(MOTOR_A1_PIN, LOW);
+      digitalWrite(MOTOR_B1_PIN, LOW);            
+    }
+    
+    analogWrite(MOTOR_PWM_PIN, pwm_Value); //Set Speed 
+   
 }
 ```
 ---
