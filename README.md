@@ -16,6 +16,8 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
       - [Drive the motor](#Drive-the-motor)
       - [Circuit Diagram](#circuit-diagram)
     - [Python Node](#python-node)
+      - [Global variables](#Global-variables)
+      - [Steps to run the code](#Steps-to-run-the-code)
   
 ## Introduction
 
@@ -270,6 +272,8 @@ Circuit diagram for interfacing encoder motor with Arduino Mega and VNH2P30 Moto
 
 This code is written for the angular control of the motor, but it can be modified for the distance/position control according to the wheel diameter.
 
+#### Global variables
+  
 importing rospy and std_msgs packages. Defining global variables and motor specifications.
 ```python
 #!/usr/bin/env python
