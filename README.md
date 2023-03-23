@@ -20,12 +20,12 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
 ## Introduction
 
 This project is designed with the purpose of controlling the position of a dc motor with ROS code and it consists of two prats. 
-- The motor is controlled using a PID Controller implemented a ROS Node. 
-- Encoder Sensing and Motor movement was done using Arduino Uno. 
-These two part of the project communicate with each other through the rosserial library/packag.
+- Python Node : The motor is controlled using a PID Controller implemented in a ROS python node. 
+- ARDUINO  : Encoder Sensing and Motor movement was done using Arduino Uno. 
+These two part of the project communicate with each other through the rosserial packag.
 
 ## Components Used
-1. ROS Melodic along with rosserial library/package.
+1. ROS Melodic along with rosserial package.
 2. Arduino Uno
 3. DC Geared Motor with Encoder ( 12v, 300RPM at 10Kgcm RMCS-5033 ) <br />
 datasheet :- <a href="/Datasheets/RMCS%205033.pdf" > RMCS 205033  <a/>
