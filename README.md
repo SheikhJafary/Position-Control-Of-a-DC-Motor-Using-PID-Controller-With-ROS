@@ -10,12 +10,12 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
   - [Program Explaination](#program-explaination)
     - [Arduino Code (serial node)](#arduino-code-serial-node)
       - [Header files](#Header-files)
-      - [Initialize Pins, PWM and Ros Parameters](#-Initialize-Pins,-PWM-and-Ros-Parameters)
+      - [Initialize Pins PWM and Ros Parameters](#Initialize-Pins-PWM-and-Ros-Parameters)
       - [Main Loop](#Main-Loop)
       - [Reading the encoder values](#Reading-the-encoder-values)
       - [Drive the motor](#Drive-the-motor)
       - [Circuit Diagram](#circuit-diagram)
-    - [Python Node (PID_node.py)](#-python-node-PID_node)
+    - [Python Node](#python-node)
   
 ## Introduction
 
@@ -121,7 +121,7 @@ Refer to headers.h.
 #include <std_msgs/Int16.h>
 
 ```
-#### Initialize Pins, PWM and Ros Parameters
+#### Initialize Pins PWM and Ros Parameters
   
   In setup function, we set up the encoder pins as interrupt pins, run timer , initialize ROS node and creat a publisher and Subscriber.
   
@@ -265,7 +265,7 @@ Circuit diagram for interfacing encoder motor with Arduino Mega and VNH2P30 Moto
 <img src="https://sheikhjafari.pgitic.ir/motor2-525x360.jpg" width=525 height=360 alt="circuit_diagram"/>
 </div>
 ---
-### Python Node (PID_node.py)
+### Python Node
 
 This code is written for the angular control of the motor, but it can be modified for the distance/position control according to the wheel diameter.
 
