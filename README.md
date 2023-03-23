@@ -61,11 +61,11 @@ Below is the **rqt_graph** of the program
 Basic Flow of the program :-
 
 1. The encodervalue is published from Arduino node. 
-2. node_motor subscribes to /encoderValue and /desiredPosition.
+2. node_motor subscribes to /ENC_Value and /desiredPosition.
 3. Now we Publish the desired angle/position to /desiredPosition.
-4. These inputs are provided to the PID controller implemented in the **node_motor.py** where Setpoint is **/desiredPosition** and feedback is /encodervalue.
-5. The PID controller gives PWM_value as output to control the motor direction and speed at a given refresh rate.
-6. This PWM value is published to /PWM_value and Arduino node subscribes to the /PWM_value and accordingly give commands to the motor driver.
+4. These inputs are provided to the PID controller implemented in the **PID_node.py** where Setpoint is **/desiredPosition** and feedback is /ENC_Value.
+5. The PID controller gives PWM_Value as output to control the motor direction and speed at a given refresh rate.
+6. This PWM value is published to /PWM_Value and Arduino node subscribes to the /PWM_Value and accordingly give commands to the motor driver.
 
 #### How does a encoder work?
 
@@ -284,74 +284,73 @@ from std_msgs.msg import Int64
 from std_msgs.msg import Float64
 from std_msgs.msg import Int16
 
+
 PWM_Output = 0
 PPR = 41
 gearRatio = 60
 decodeNumber = 4
-
-encoderValue = 0
+pi = 3.14
+r = 0.0325
+ENC_Value = 0
 started = False
 started1 = False
 desired_Position = 0.0
 
 ```
-Defining Callback functions for subscribers and a general function with timer for subscribing to two topics */encoderValue* and */desiredPosition*.
+Defining Callback functions for subscribers and a general function with timer for subscribing to two topics */ENC_Value* and */desiredPosition*.
 ```python
 pub = rospy.Publisher('/PWM_Values',Int16,queue_size=100)
-pub1 = rospy.Publisher('/Current_angle',Int16,queue_size=100)
 
-def sub_encoderValue():
-    rospy.init_node('node_motor', anonymous=True)
-    rospy.Subscriber('encoderValue',Int64,callback)
+ef Func_ENC_Value():
+    rospy.init_node('NODE_PID', anonymous=True)
+    rospy.Subscriber('ENC_Value',Int64,callback)
     rospy.Subscriber('desiredPosition',Float64,callback1)
     timer = rospy.Timer(rospy.Duration(0.01),timer_callback)
     rospy.spin()
     timer.shutdown()
 
 def callback(data):
-    global started,encoderValue
-    print "EncoderValue Received",encoderValue
-    encoderValue = data.data
+    global started,ENC_Value
+    print "ENC_Value Received",ENC_Value
+    ENC_Value = data.data
     if (not started):
         started = True
 
 def callback1(data):
     global started1,desired_Position
+    #print "Desired Received",desired_Position
     desired_Position = data.data
     if (not started1):
         started1 = True
+
 ```
 
-Defining a callback function to calculate the PID output according to the updated */encoderValue* and */desiredPosition*. After that the we run the sub_encoder() function with runs whole program.
+Defining a callback function to calculate the PID output according to the updated */END_Value* and */desiredPosition*. After that the we run the sub_encoder() function with runs whole program.
 ```python
-def timer_callback(event):
-    global started,started1,pub,encoderValue,PWM_Output,desired_Position,current_wheel_distance,current_angle
-    
+ef timer_callback(event):
+    global started,started1,pub,ENC_Value,PWM_Output,desired_Position,current_wheel_distance,current_angle
+   
     if(started1):
         if (started):
 
-            previous_angle=current_angle
-            pid = PID(0.022,0.01,2,setpoint=desired_Position)
+            previouswheeldistance = current_wheel_distance
+            pid = PID(100,0.5,1, setpoint=desired_Position,auto_mode=True)
             pid.output_limits = (-255, 255)
             pid.sample_time = 0.001
-            PWM_Output = pid(previous_angle)
+            PWM_Output = pid(previouswheeldistance)
+            current_wheel_distance = (ENC_Value * 2 * pi *r) / (PPR * gearRatio * decodeNumber)
 
-            if( 0 < PWM_Output <= 13):
-                PWM_Output = PWM_Output + 11.5
-            elif (-13 <= PWM_Output < 0):
-                PWM_Output = PWM_Output - 11.5
-            
-            current_angle = encoderValue/24
-            
+           
             pub.publish(PWM_Output)
-            
+           
             print "Publishing PWM Values",PWM_Output
-            print "Current angle",current_angle
-            print "Desired Position",desired_Position
+            print "Current Wheel distance",current_wheel_distance
+            
+
 
 if __name__ == '__main__':
     print "Running"
-    sub_encoderValue()
+    Func_ENC_Value()
 
 ```
 ---
