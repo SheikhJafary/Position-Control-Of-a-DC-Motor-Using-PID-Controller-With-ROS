@@ -10,8 +10,10 @@ Title: Position Control Of a DC Motor Using PID Controller In ROS
   - [Program Explaination](#program-explaination)
     - [Arduino Code (serial node)](#arduino-code-serial-node)
       - [Header files](#Header-files)
-      - [Code for reading the encoder values](#code-for-reading-the-encoder-values)
-      - [Code to rotate the motor.](#code-to-rotate-the-motor)
+      - [Initialize Pins, PWM and Ros Parameters](#Initialize-Pins,-PWM-and-Ros-Parameters)
+      - [Main Loop](#Main-Loop)
+      - [Reading the encoder values](#Reading-the-encoder-values)
+      - [Drive the motor](#Drive-the-motor)
       - [Circuit Diagram](#circuit-diagram)
     - [Python Node (PID_node.py)](#python-node-PID_node)
   
@@ -156,7 +158,7 @@ void loop()
   delay(100);
 }
 ```
-#### Code for reading the encoder value
+#### Reading the encoder value
 
 Now we code the Interrupt service routine program to update the encoder value upon the movement of the shaft
 ```cpp
@@ -184,7 +186,7 @@ void readEncoderB()
   }
 }
 ```
-#### Code to rotate the motor
+#### Drive the motor
 Defining the Motor Pins for motor1 slot on the shield.
 Refer to var.h.
 ```cpp
