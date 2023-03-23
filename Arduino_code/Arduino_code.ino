@@ -25,7 +25,6 @@ void loop()
 {
   nh.loginfo("Encoder Value");
   encoder.data = currentPosition;
-   nh.logdebug("Debug Statement");
   ENC_Value.publish( &encoder );
   nh.spinOnce();
   delay(100);
@@ -45,30 +44,30 @@ void get_apply_pwm( const std_msgs::Int16& pwm_value){
   }
 }
 //Function that controls the variables: 
-//motor(0 or 1), 
+//motor_en(0 or 1), 
 //direction (cw or ccw) ,
 //pwm (entra 0 to 255);
 void drive_motor(int16_t motor_en, int16_t direct, uint16_t pwm_Value)         
 {
   if(motor_en == MOTOR)
   {
-    if(direct == CW)
+    if(direct == CW) //Set Direction Clockwise
     {
       digitalWrite(MOTOR_A1_PIN, LOW); 
       digitalWrite(MOTOR_B1_PIN, HIGH);
     }
-    else if(direct == CCW)
+    else if(direct == CCW) //Set Direction Anticlockwise
     {
       digitalWrite(MOTOR_A1_PIN, HIGH);
       digitalWrite(MOTOR_B1_PIN, LOW);      
     }
-    else 
+    else //Stop Motor
     {
       digitalWrite(MOTOR_A1_PIN, LOW);
       digitalWrite(MOTOR_B1_PIN, LOW);            
     }
     
-    analogWrite(MOTOR_PWM_PIN, pwm_Value); 
+    analogWrite(MOTOR_PWM_PIN, pwm_Value); //Set Speed 
   }
   
 }
